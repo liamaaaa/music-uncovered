@@ -16,6 +16,7 @@ public class ApiApp extends Application {
     Stage stage;
     Scene scene;
     VBox root;
+    ApiAppLoader content;
 
     /**
      * Constructs an {@code ApiApp} object. This default (i.e., no argument)
@@ -23,6 +24,8 @@ public class ApiApp extends Application {
      */
     public ApiApp() {
         root = new VBox();
+        content = new ApiAppLoader();
+        root.getChildren().add(content);
     } // ApiApp
 
     /** {@inheritDoc} */
@@ -32,24 +35,25 @@ public class ApiApp extends Application {
         this.stage = stage;
 
         // demonstrate how to load local asset using "file:resources/"
-        Image bannerImage = new Image("file:resources/readme-banner.png");
-        ImageView banner = new ImageView(bannerImage);
-        banner.setPreserveRatio(true);
-        banner.setFitWidth(640);
+        //Image bannerImage = new Image("file:resources/readme-banner.png");
+        //ImageView banner = new ImageView(bannerImage);
+        //banner.setPreserveRatio(true);
+        //banner.setFitWidth(640);
 
         // some labels to display information
-        Label notice = new Label("Modify the starter code to suit your needs.");
+        //Label notice = new Label("Modify the starter code to suit your needs.");
 
         // setup scene
-        root.getChildren().addAll(banner, notice);
-        scene = new Scene(root);
+        //root.getChildren().addAll(banner, notice);
+        scene = new Scene(root, 600, 400);
 
-        // setup stage
         stage.setTitle("ApiApp!");
         stage.setScene(scene);
+        content.setPrefSize(scene.getWidth(), scene.getHeight());
         stage.setOnCloseRequest(event -> Platform.exit());
         stage.sizeToScene();
         stage.show();
+        Platform.runLater(() -> this.stage.setResizable(false));
 
     } // start
 
