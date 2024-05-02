@@ -34,6 +34,11 @@ public class ApiApp extends Application {
 
         this.stage = stage;
 
+        content.searchEngine.setPrefWidth(300);
+        content.searchButton.setPrefWidth(50);
+        content.artist1.setPrefWidth(100);
+        content.artist2.setPrefWidth(100);
+        content.artist3.setPrefWidth(100);
         // demonstrate how to load local asset using "file:resources/"
         //Image bannerImage = new Image("file:resources/readme-banner.png");
         //ImageView banner = new ImageView(bannerImage);
@@ -45,7 +50,7 @@ public class ApiApp extends Application {
 
         // setup scene
         //root.getChildren().addAll(banner, notice);
-        scene = new Scene(root, 600, 400);
+            scene = new Scene(root, 600, 400);
 
         stage.setTitle("ApiApp!");
         stage.setScene(scene);
