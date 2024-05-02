@@ -23,6 +23,8 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Arrays;
 import java.nio.charset.StandardCharsets;
 import cs1302.api.Release;
+import java.util.List;
+import javafx.geometry.Insets;
 
 public class ApiAppLoader extends VBox {
 
@@ -92,10 +94,11 @@ public class ApiAppLoader extends VBox {
 
         this.getChildren().addAll(search, artistInfo, otherArtist);
 
-        searchButton.setOnAction((event) -> {
-            // add method call here
-            loadReleases();
+        this.setPadding(new Insets(10));
+        this.setSpacing(10);
 
+        searchButton.setOnAction((event) -> {
+            loadReleases();
         });
 
         artist1.setOnAction((event) -> {
@@ -131,12 +134,21 @@ public class ApiAppLoader extends VBox {
                 int statusCode = response.statusCode();
                 if (statusCode == 200) {
                     String json = response.body();
-                    System.out.println(json);
+                    //System.out.println(json);
                     ArtistOutput artistList  = gson.fromJson(json, ArtistOutput.class);
                     if (artistList != null && artistList.artists != null) {
-                        List<Artist> artistsSep = artistList.artists;
-                        Artist artist = artistsSep.get(0); // gets first artist
+                        Artist artist = artistList.artists.get(0); // gets first artist
+                        System.out.println("Name: " + artist.name);
+                        System.out.println("Country: " + artist.country);
+                        System.out.println("Tags: ");
 
+                        for (int i = 0; i < 5; i++) { // arrange in order of count/popularity???
+                            if (artist.tags.get(i).toString() == null) {
+                                i = 5;
+                            }
+                            loadPage();
+                            System.out.println("\t+ " + artist.tags.get(i).toString());
+                        }
                     }
                 } else {
                     System.out.println("Failed to retrieve artist: " + statusCode);
@@ -149,43 +161,35 @@ public class ApiAppLoader extends VBox {
         searchButton.setDisable(false);
     }
 
-    /**
-     * Sorts {@code releases} array from earliest to latest release.
-     * This is not in terms of ALL of an artist's work, just the ones listed.
-     */
-    public void sortDate() {
-        int max = 0;
-        int maxCount = 0;
-        for (int i = 4; i >= 0; i--) {
-            for (int j = 0; j < i; j++) {
-                if (releases[i].date > max) {
-                    max = releases[i].date;
-                    maxCount = i;
+
+    /** public void findReleases(Artist artistName) {
+        try {
+            String urlID = "https://musicbrainz.org/ws/2/release-group?artist="
+                + artistName.id // gets id from Artist class
+                + "&fmt=json";
+            HttpRequest requestRelease = HttpRequest.newBuilder()
+                .uri(URI.create(urlID))
+                .build();
+            HttpResponse<String> responseRelease = HTTP_CLIENT
+                .send(requestRelease, BodyHandlers.ofString());
+            System.out.println(responseRelease.body());
+            int statusCode2 = responseRelease.statusCode();
+            if (statusCode2 == 200) {
+                Gson gson = new Gson();
+                Release[] releases = gson // creates array of releases (5)
+                    .fromJson(responseRelease.body(), Release[].class);
+                if (releases != null && releases.length > 0) {
+                    System.out.println(releases[1].toString()); // toString()?
+                } else {
+                    System.out.println("No releases found for the artist"); // code to move to next artist on list?
                 }
+            } else {
+                System.out.println("Failed to retrieve releases" + statusCode2);
             }
-            releaseLabel[i] = releases[maxCount];
-            max = 0;
-            maxCount = 0;
-        }
-    }
-
-    public void findReleases(Artist artistName) {
-        String urlID = "https://musicbrainz.org/ws/2/release-groups?artist="
-            + artistName.id // gets id from Artist class
-            + "&type=album|ep|single&fmt=json";
-        HttpRequest requestRelease = HttpRequest.newBuilder()
-            .uri(URI.create(urlID))
-            .build();
-        HttpResponse<String> responseRelease = HTTP_CLIENT
-            .send(requestRelease, BodyHandlers.ofString());
-        int statusCode2 = responseRelease.statusCode();
-        if (statusCode2 == 200) {
-            Release[] releases = gson // creates array of releases (5)
-                .fromJson(responseRelease.body(), Release[].class);
-            System.out.println(releases[0].toString()); // toString()?
-        } else {
-            System.out.println("Failed to retrieve releases" + statusCode2);
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Error when finding releases: ");
+            e.printStackTrace();
         }
 
-    }
+        }*/
 }
