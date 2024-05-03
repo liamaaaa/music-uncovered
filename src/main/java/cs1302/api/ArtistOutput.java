@@ -5,5 +5,5 @@ import java.util.List;
 public class ArtistOutput {
 
     List<Artist> artists;
-
+    Artist artist;
 }
