@@ -7,6 +7,9 @@ public class Artist {
     String name;
     String country;
     List<Tag> tags;
+    List<ArtistPicture> artistPics;
+    List<Track> tracks;
+    List<Album> albums;
 
     static class Tag {
         String name;
@@ -16,5 +19,6 @@ public class Artist {
             return name;
         }
     }
+
 
 }
