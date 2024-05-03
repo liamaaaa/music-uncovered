@@ -180,22 +180,22 @@ public class ApiAppLoader extends VBox {
             if (statusCode == 200) {
                 String json = response.body();
                 //System.out.println(json);
-                artist = gson.fromJson(json, Artist.class);
-                if (artist != null && artist.tracks != null) {
+                TopTracksResponse topTracksResp = gson.fromJson(json, TopTracksResponse.class);
+                if (topTracksResp != null && topTracksResp.toptracks != null &&
+                    topTracksResp.toptracks.track != null) {
                     releaseInfo.getChildren().add(new Text("\nTop Tracks: "));
                     Text trackList;
                     for (int i = 0; i < 5; i++) {
                         //if (artist.tracks.size() - 1 < i) {
                         //    i = 5;
                         //} else {
-                        trackList = new Text("\n\t+" + artist.tracks.get(i).toString());
-                        System.out.println("\n\t+" + artist.tracks.get(i).toString());
+                        trackList = new Text("\n\t+" + topTracksResp.toptracks.track.get(i).name);
                         releaseInfo.getChildren().add(trackList);
                         //}
                     }
                     releasePane.layout();
                 } else {
-                    System.out.println("Artist is null");
+                    System.out.println("Cannot retrieve track list");
                 }
             } else {
                 System.out.println("Status Code error: " + statusCode);
@@ -220,14 +220,18 @@ public class ApiAppLoader extends VBox {
             int statusCode = response.statusCode();
             if (statusCode == 200) {
                 String json = response.body();
-                Artist artist = gson.fromJson(json, Artist.class);
-                if (artist != null && artist.albums != null) {
+                TopAlbumsResponse topAlbumsResp = gson.fromJson(json, TopAlbumsResponse.class);
+                if (topAlbumsResp != null && topAlbumsResp.topalbums != null
+                    && topAlbumsResp.topalbums.album != null) {
                     releaseInfo.getChildren().add(new Text("\nTop Albums: "));
                     Text trackList;
                     for (int i = 0; i < 3; i++) {
-                        trackList = new Text("\n\t+" + artist.albums.get(i).toString());
+                        trackList = new Text("\n\t+" + topAlbumsResp.topalbums
+                            .album.get(i).name);
                         releaseInfo.getChildren().add(trackList);
                     }
+                } else {
+                    System.out.println("Cannot retrieve album list");
                 }
             }
         } catch (IOException | InterruptedException e) {
