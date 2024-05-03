@@ -8,6 +8,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.geometry.Pos;
+import java.io.FileReader;
 
 /**
  * REPLACE WITH NON-SHOUTING DESCRIPTION OF YOUR APP.
@@ -31,27 +33,25 @@ public class ApiApp extends Application {
     /** {@inheritDoc} */
     @Override
     public void start(Stage stage) {
+        String homeUrl = "file:resources/homescreen.jpg";
+        String button = "file:resources/button.jpg";
 
         this.stage = stage;
 
+        Image home = new Image(homeUrl);
+        content.artistImage.setImage(home);
+
         content.searchEngine.setPrefWidth(300);
         content.searchButton.setPrefWidth(50);
-        content.artist1.setPrefWidth(100);
-        content.artist2.setPrefWidth(100);
-        content.artist3.setPrefWidth(100);
-        // demonstrate how to load local asset using "file:resources/"
-        //Image bannerImage = new Image("file:resources/readme-banner.png");
-        //ImageView banner = new ImageView(bannerImage);
-        //banner.setPreserveRatio(true);
-        //banner.setFitWidth(640);
 
-        // some labels to display information
-        //Label notice = new Label("Modify the starter code to suit your needs.");
+        content.artist1.setPrefSize(100, 100);
+        content.artist2.setPrefSize(100,100);
+        content.artist3.setPrefSize(100, 100);
+        content.setButtonImages(button);
+        content.otherArtist.setAlignment(Pos.CENTER);
 
-        // setup scene
-        //root.getChildren().addAll(banner, notice);
-            scene = new Scene(root, 600, 400);
-
+        scene = new Scene(root, 625, 400);
+        root.setStyle("-fx-background-color: lightblue;");
         stage.setTitle("ApiApp!");
         stage.setScene(scene);
         content.setPrefSize(scene.getWidth(), scene.getHeight());
