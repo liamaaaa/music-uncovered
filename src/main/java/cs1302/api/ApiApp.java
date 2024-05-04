@@ -12,7 +12,10 @@ import javafx.geometry.Pos;
 import java.io.FileReader;
 
 /**
- * REPLACE WITH NON-SHOUTING DESCRIPTION OF YOUR APP.
+ * ApiApp uses search bar to find top related artist.
+ * Prints out info on the artist, top tracks, top albums.
+ * related artists, and includes an image of a release from them.
+ * Includes a clear button to clear the information box.
  */
 public class ApiApp extends Application {
     Stage stage;

@@ -30,6 +30,9 @@ import javafx.application.Platform;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ContentDisplay;
 
+/**
+ * Custom component class to store objects of the scene.
+ */
 public class ApiAppLoader extends VBox {
 
     HBox search;
@@ -62,6 +65,10 @@ public class ApiAppLoader extends VBox {
 
     public static final String API_KEY = "ac27f5d94abeff5961ce56b3d823e86d";
 
+    /**
+     * Initializes objects of this ApiAppLoader class.
+     * Creates ActionEvents for buttons of the class.
+     */
     public ApiAppLoader() {
         super();
 
@@ -121,6 +128,10 @@ public class ApiAppLoader extends VBox {
 
     }
 
+    /**
+     * Searches MusicBrainz API to store information in {@code Artist} class.
+     * Stores name of artist, country of origin, and tags related to them.
+     */
     public void loadReleases() {
         searchButton.setDisable(true);
         if (searchEngine.getText().isEmpty()) {
@@ -160,6 +171,10 @@ public class ApiAppLoader extends VBox {
         searchButton.setDisable(false);
     }
 
+    /**
+     * Uses Last.fm API to find  top 5 tracks from an artist searched in MusicBrainz API.
+     * Adds these tracks to {@code releaseInfo}.
+     */
     public void topTracks() {
         String term = URLEncoder.encode(artist.name, StandardCharsets.UTF_8);
         String query = "?method=artist.gettoptracks&artist=" + term + "&api_key=" + API_KEY
@@ -202,6 +217,11 @@ public class ApiAppLoader extends VBox {
         }
     }
 
+     /**
+      * Uses Last.fm API to find  top 3 albums/EPs/singles from an artist
+      *     searched in MusicBrainz API.
+      * Adds these tracks to {@code releaseInfo}.
+      */
     public void topAlbums() {
         String term = URLEncoder.encode(artist.name, StandardCharsets.UTF_8);
         String query = "?method=artist.gettopalbums&artist=" + term + "&api_key=" + API_KEY
@@ -240,6 +260,10 @@ public class ApiAppLoader extends VBox {
         }
     }
 
+     /**
+      * Uses Last.fm API to find  top 3 related artists from an artist searched in MusicBrainz API.
+      * Adds these tracks to {@code releaseInfo}.
+      */
     public void similarArtists() {
         String term = URLEncoder.encode(artist.name, StandardCharsets.UTF_8);
         String query = "?method=artist.getsimilar&artist=" + term + "&api_key=" + API_KEY
@@ -278,6 +302,9 @@ public class ApiAppLoader extends VBox {
         }
     }
 
+    /**
+     * Loads info about the name, country of origin, and tags for an artist.
+     */
     public void loadPage() {
         if (artist != null) {
             Text name = new Text("\n Name: " + artist.name);
@@ -302,7 +329,9 @@ public class ApiAppLoader extends VBox {
         }
     }
 
-
+    /**
+     * Loads related album image to artist from iTunes API.
+     */
     public void loadImage() {
         String term = URLEncoder.encode(artist.name, StandardCharsets.UTF_8);
         String limit = URLEncoder.encode("200", StandardCharsets.UTF_8);
@@ -332,8 +361,11 @@ public class ApiAppLoader extends VBox {
         } catch (IOException | InterruptedException e) {
             System.out.println("Cannot retrieve album image");
         }
-    }
+        }
 
+    /**
+     * Sets images for 3 bottom buttons.
+     */
     public void setButtonImages(String imageUrl) {
         artist1.setPrefWidth(205);
         artist2.setPrefWidth(205);
@@ -360,6 +392,10 @@ public class ApiAppLoader extends VBox {
         artist3.setContentDisplay(ContentDisplay.TOP);
     }
 
+    /**
+     * Displays error alert if no search results are found
+     *     for an artist.
+     */
     private void nullArtistAlert() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -369,6 +405,9 @@ public class ApiAppLoader extends VBox {
         searchButton.setDisable(false);
     }
 
+    /**
+     * Displays error alert if search bar is empty.
+     */
     private void emptySearchAlert() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");

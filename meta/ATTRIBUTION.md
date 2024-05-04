@@ -7,15 +7,6 @@ author. Please keep this file organized using Markdown. If you click on
 this file in your GitHub repository website, then you will see that the
 Markdown is transformed into nice-looking HTML.
 
-### Authored Assets
-
-* Example 1 Asset Name
-  - `resources/path/to/file`
-  - Your Name. Year.
-
-* Example 2 Asset Name
-  - `resources/path/to/file`
-  - Your Name. Year.
 
 ### Assets Authored by Others
 
@@ -23,14 +14,14 @@ Markdown is transformed into nice-looking HTML.
 > you should list it as "Assumed proprietary: using under academic fair use."
 > instead of leaving the license information blank.
 
-* Example 1 Asset Name
-  - `resources/path/to/file`
-  - Author. Year.
-  - URL
-  - License
+* Example 1 HomeScreen Image
+  - `resources/homescreen.png
+  - Unknown Author, Unknown Year
+  - https://i.pinimg.com/originals/1b/97/83/1b9783d06669690f108c212f58f1e729.jpg
+  - License: Assumed proprietary: using under academic fair use.
 
-* Example 2 Asset Name
-  - `resources/path/to/file`
-  - Author. Year.
-  - URL
-  - License
+* Example 2 Button Image
+  - `resources/button.png`
+  - CSA Images. 2021.
+  - https://images.fineartamerica.com/images/artworkimages/mediumlarge/2/5-record-csa-images.jpg
+  - License: Assumed proprietary: using under academic fair use.
