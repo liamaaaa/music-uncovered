@@ -51,7 +51,7 @@ public class ApiApp extends Application {
         content.otherArtist.setAlignment(Pos.CENTER);
 
         scene = new Scene(root, 625, 400);
-        root.setStyle("-fx-background-color: lightblue;");
+        root.setStyle("-fx-background-color: lavender;");
         stage.setTitle("ApiApp!");
         stage.setScene(scene);
         content.setPrefSize(scene.getWidth(), scene.getHeight());
