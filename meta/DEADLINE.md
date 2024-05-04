@@ -14,14 +14,16 @@ Markdown is transformed into nice-looking HTML.
 
 > **Also, include the GitHub `https` URL to your repository.**
 
-This app takes user input through the search bar to find the most popular artist related to that
-    search using MusicBrainz API of musical artists. Then, after clicking the "Go" button, a user will
-    be met with basic information about the artist, including their stage name, country of origin, and
-    top "tags", which are words relating to their music or performance style. Users have the option to
-    click on 3 buttons. The first one adds the top 5 most popular tracks for the saved artist to the information
-    box on the side of the scene, using the LastFM API to search for top tracks from the artist saved from
-    the MusicBrainz API. The second button adds the top 3 most popular albums/EPs/Singles from the saved
-    artist to the information box. The third button adds the top 3 most popular related artists to the saved
+    This app takes user input through the search bar (fairly spelling sensitive) to find the most
+    popular artist related to that  search using MusicBrainz API of musical artists. Then, after
+    clicking the "Go" button, a user will be met with basic information about the artist, including
+    their stage name, country of origin, and top "tags", which are words relating to their music or
+    performance style.
+
+    Users have the option to click on 3 buttons. The first one adds the top 5 most popular tracks for the
+    saved artist to the information box on the side of the scene, using the LastFM API to search for top tracks
+    from the artist saved from the MusicBrainz API. The second button adds the top 3 most popular albums/EPs/Singles
+    from the saved artist to the information box. The third button adds the top 3 most popular related artists to the saved
     artist to the information box as well. These three sets of information can be added to the screen as many
     times as the user would like. There is also a "clear" button on the top right to clear the information box
     of any previously existing text. When a user searches up an artist, the right-side of the screen will show

@@ -155,8 +155,8 @@ public class ApiAppLoader extends VBox {
                     if (artistList != null && artistList.artists != null
                         && !artistList.artists.isEmpty()) {
                         artist = artistList.artists.get(0); // use artist.name for other methods
-                        loadPage();
                         loadImage();
+                        loadPage();
                     } else {
                         nullArtistAlert();
                     }
@@ -356,7 +356,7 @@ public class ApiAppLoader extends VBox {
                         .get(1).artworkUrl100));
                 }
             } else {
-                System.out.println("Status Code error: " + statusCode);
+                artist = null;
             }
         } catch (IOException | InterruptedException e) {
             System.out.println("Cannot retrieve album image");
