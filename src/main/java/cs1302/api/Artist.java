@@ -8,9 +8,6 @@ public class Artist {
     String country;
     List<Tag> tags;
     List<ArtistPicture> artistPics;
-    List<Album> albums;
-    List<SimilarArtist> similarArtists;
-    AlbumImage albumPic;
 
     static class Tag {
         String name;
@@ -21,18 +18,8 @@ public class Artist {
         }
     }
 
-    static class ArtistPicture {
+    class ArtistPicture {
         String url;
     }
 
-    static class Album {
-        String name;
-    }
-
-    static class SimilarArtist {
-        String name;
-    }
-    static class AlbumImage {
-        String url;
-    }
 }
