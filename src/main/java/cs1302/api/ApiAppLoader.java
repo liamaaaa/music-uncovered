@@ -28,6 +28,7 @@ import javafx.scene.text.Text;
 import javafx.scene.layout.Priority;
 import javafx.application.Platform;
 import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.ContentDisplay;
 
 public class ApiAppLoader extends VBox {
 
@@ -44,7 +45,7 @@ public class ApiAppLoader extends VBox {
     ScrollPane releasePane;
 
     HBox otherArtist;
-    Button artist1; // add label later
+    Button artist1;
     ImageView artistImage1;
     Button artist2;
     ImageView artistImage2;
@@ -52,6 +53,7 @@ public class ApiAppLoader extends VBox {
     ImageView artistImage3;
 
     Artist artist;
+    Button clearButton;
 
     public static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
         .version(HttpClient.Version.HTTP_2)
@@ -67,7 +69,8 @@ public class ApiAppLoader extends VBox {
         this.searchLabel = new Label("Enter Artist Name: ");
         this.searchEngine = new TextField("Search");
         this.searchButton = new Button("Go");
-        this.search.getChildren().addAll(searchLabel, searchEngine, searchButton);
+        this.clearButton = new Button("Clear");
+        this.search.getChildren().addAll(searchLabel, searchEngine, searchButton, clearButton);
 
         this.artistInfo = new HBox(8);
         this.artistImage = new ImageView();
@@ -84,19 +87,14 @@ public class ApiAppLoader extends VBox {
 
         this.otherArtist = new HBox(8);
         this.artistImage1 = new ImageView(); // create loadImage method
-        this.artist1 = new Button("Top Tracks");
+        this.artist1 = new Button("Top Tracks", artistImage1);
         this.artistImage2 = new ImageView();
-        this.artist2 = new Button("Top Albums");
+        this.artist2 = new Button("Top Albums", artistImage2);
         this.artistImage3 = new ImageView();
-        this.artist3 = new Button("Similar Artists");
+        this.artist3 = new Button("Similar Artists", artistImage2);
         this.otherArtist.getChildren().addAll(artist1, artist2, artist3);
         HBox.setHgrow(artist1, Priority.NEVER);
         otherArtist.setSpacing(10);
-
-        artist1.setTextOverrun(OverrunStyle.CLIP);
-        artist2.setTextOverrun(OverrunStyle.CLIP);
-        artist3.setTextOverrun(OverrunStyle.CLIP);
-
 
         this.getChildren().addAll(search, artistInfo, otherArtist);
 
@@ -106,6 +104,8 @@ public class ApiAppLoader extends VBox {
         searchButton.setOnAction((event) -> {
             loadReleases();
         });
+
+        clearButton.setOnAction((event) -> releaseInfo.getChildren().clear());
 
         artist1.setOnAction((event) -> {
             topTracks();
@@ -125,7 +125,7 @@ public class ApiAppLoader extends VBox {
         searchButton.setDisable(true);
         if (searchEngine.getText().isEmpty()) {
             System.out.println("Empty Search Alert here:");
-            //emptySearchAlert();
+            emptySearchAlert();
         } else {
             String term = URLEncoder.encode(searchEngine.getText(), StandardCharsets.UTF_8);
             String query = "query=artist:" + term + "&limit=1&fmt=json"; // change limit?
@@ -141,16 +141,13 @@ public class ApiAppLoader extends VBox {
                 if (statusCode == 200) {
                     String json = response.body();
                     ArtistOutput artistList  = gson.fromJson(json, ArtistOutput.class);
-                    if (artistList != null && artistList.artists != null) {
-                        artist = artistList.artists.get(0); // gets first artist
-                        for (int i = 0; i < 5; i++) {
-                            if (artist.tags.size() < i + 1
-                                || artist.tags.get(i).toString() == null) {
-                                i = 5;
-                            }
-                        }
-                        loadPage(artist);
-                        loadImage(artist);
+                    if (artistList != null && artistList.artists != null
+                        && !artistList.artists.isEmpty()) {
+                        artist = artistList.artists.get(0); // use artist.name for other methods
+                        loadPage();
+                        loadImage();
+                    } else {
+                        nullArtistAlert();
                     }
                 } else {
                     System.out.println("Failed to retrieve artist: " + statusCode);
@@ -164,11 +161,10 @@ public class ApiAppLoader extends VBox {
     }
 
     public void topTracks() {
-        String term = URLEncoder.encode(searchEngine.getText(), StandardCharsets.UTF_8);
+        String term = URLEncoder.encode(artist.name, StandardCharsets.UTF_8);
         String query = "?method=artist.gettoptracks&artist=" + term + "&api_key=" + API_KEY
             + "&format=json";
         String createUrl = "http://ws.audioscrobbler.com/2.0/" + query;
-
         try {
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(createUrl))
@@ -179,19 +175,20 @@ public class ApiAppLoader extends VBox {
             int statusCode = response.statusCode();
             if (statusCode == 200) {
                 String json = response.body();
-                //System.out.println(json);
                 TopTracksResponse topTracksResp = gson.fromJson(json, TopTracksResponse.class);
                 if (topTracksResp != null && topTracksResp.toptracks != null &&
                     topTracksResp.toptracks.track != null) {
                     releaseInfo.getChildren().add(new Text("\nTop Tracks: "));
                     Text trackList;
                     for (int i = 0; i < 5; i++) {
-                        //if (artist.tracks.size() - 1 < i) {
-                        //    i = 5;
-                        //} else {
-                        trackList = new Text("\n\t+" + topTracksResp.toptracks.track.get(i).name);
-                        releaseInfo.getChildren().add(trackList);
-                        //}
+                        if (topTracksResp.toptracks.track.size() - 1 < i) {
+                            i = 5;
+                        } else if (topTracksResp.toptracks.track
+                            .get(i).name != null) {
+                            trackList = new Text("\n\t+"
+                            + topTracksResp.toptracks.track.get(i).name);
+                            releaseInfo.getChildren().add(trackList);
+                        }
                     }
                     releasePane.layout();
                 } else {
@@ -206,7 +203,7 @@ public class ApiAppLoader extends VBox {
     }
 
     public void topAlbums() {
-        String term = URLEncoder.encode(searchEngine.getText(), StandardCharsets.UTF_8);
+        String term = URLEncoder.encode(artist.name, StandardCharsets.UTF_8);
         String query = "?method=artist.gettopalbums&artist=" + term + "&api_key=" + API_KEY
              + "&format=json";
         String createUrl = "http://ws.audioscrobbler.com/2.0/" + query;
@@ -223,12 +220,16 @@ public class ApiAppLoader extends VBox {
                 TopAlbumsResponse topAlbumsResp = gson.fromJson(json, TopAlbumsResponse.class);
                 if (topAlbumsResp != null && topAlbumsResp.topalbums != null
                     && topAlbumsResp.topalbums.album != null) {
-                    releaseInfo.getChildren().add(new Text("\nTop Albums: "));
+                    releaseInfo.getChildren().add(new Text("\nTop Albums, EPs, Singles: "));
                     Text trackList;
                     for (int i = 0; i < 3; i++) {
-                        trackList = new Text("\n\t+" + topAlbumsResp.topalbums
-                            .album.get(i).name);
-                        releaseInfo.getChildren().add(trackList);
+                        if (topAlbumsResp.topalbums.album.size() - 1 < i) {
+                            i = 3;
+                        } else if (!topAlbumsResp.topalbums.album.get(i).name.equals("(null)")) {
+                            trackList = new Text("\n\t+" + topAlbumsResp.topalbums
+                                .album.get(i).name);
+                            releaseInfo.getChildren().add(trackList);
+                        }
                     }
                 } else {
                     System.out.println("Cannot retrieve album list");
@@ -237,63 +238,100 @@ public class ApiAppLoader extends VBox {
         } catch (IOException | InterruptedException e) {
             System.out.println("Cannot retrieve albums");
         }
-
     }
 
     public void similarArtists() {
-    }
-
-    public void loadPage(Artist artistName) {
-        Text name = new Text("\n Name: " + artistName.name);
-        Text country = new Text("\n Country: " + artistName.country);
-        this.releaseInfo.getChildren().addAll(name, country);
-        this.releaseInfo.getChildren().add(new Text("\n Tags: "));
-        for (int i = 0; i < 5; i++) {
-            if (artistName.tags.size() < i + 1
-                || artistName.tags.get(i).toString() == null) { // add try catch for this
-                i = 5;
-
-            } else {
-                releaseInfo.getChildren().add(new Text("\n\t+ "
-                    + artistName.tags.get(i).toString()));
+        String term = URLEncoder.encode(artist.name, StandardCharsets.UTF_8);
+        String query = "?method=artist.getsimilar&artist=" + term + "&api_key=" + API_KEY
+            + "&format=json";
+        String createUrl = "http://ws.audioscrobbler.com/2.0/" + query;
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(createUrl))
+                .build();
+            HttpResponse<String> response = HTTP_CLIENT
+                .send(request, BodyHandlers.ofString());
+            Gson gson = new Gson();
+            int statusCode = response.statusCode();
+            if (statusCode == 200) {
+                String json = response.body();
+                TopSimilarResponse topSimilarResp = gson.fromJson(json, TopSimilarResponse.class);
+                if (topSimilarResp != null && topSimilarResp.similarartists != null
+                    && topSimilarResp.similarartists.artist != null) {
+                    releaseInfo.getChildren().add(new Text("\nRelated Acts/Artists: "));
+                    Text otherList;
+                    for (int i = 0; i < 3; i++) {
+                        if (topSimilarResp.similarartists.artist.size() - 1 < i) {
+                            i = 3;
+                        } else if (topSimilarResp.similarartists.artist.get(i).name != null) {
+                            otherList = new Text("\n\t+" + topSimilarResp.similarartists
+                                .artist.get(i).name);
+                            releaseInfo.getChildren().add(otherList);
+                        }
+                    }
+                } else {
+                    System.out.println("Cannot retrieve similar artists list");
+                }
             }
+        } catch (IOException | InterruptedException e) {
+            System.out.println("Cannot retrieve similar artists");
         }
     }
 
-    public void loadImage(Artist artistName) {
-        new Thread(() ->
-        {
-            String term = URLEncoder.encode(searchEngine.getText(), StandardCharsets.UTF_8);
-            String query = "?method=artist.getinfo&artist=" + term + "&api_key=" + API_KEY
-                + "&format=json";
-            String createUrl = "http://ws.audioscrobbler.com/2.0/" + query;
-            try {
-                HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(createUrl))
-                    .build();
-                HttpResponse<String> response = HTTP_CLIENT
-                    .send(request, BodyHandlers.ofString());
-                Gson gson = new Gson();
-                int statusCode = response.statusCode();
-                if (statusCode == 200) {
-                    String json = response.body();
-                    String imageUrl = parseJson(json);
-                    if (imageUrl != null) {
-                        Platform.runLater(() -> {
-                            artistImage.setFitHeight(200);
-                            artistImage.setFitWidth(250);
-                            artistImage.setImage(new Image(imageUrl));
-                        });
+    public void loadPage() {
+        if (artist != null) {
+            Text name = new Text("\n Name: " + artist.name);
+            Text country = new Text("\n Country: " + artist.country);
+            this.releaseInfo.getChildren().addAll(name, country);
+            this.releaseInfo.getChildren().add(new Text("\n Tags: "));
+            if (artist != null && artist.tags != null) {
+                for (int i = 0; i < 5; i++) {
+                    if (artist.tags.size() < i + 1
+                        || artist.tags.get(i).toString() == null) { // add try catch for this
+                        i = 5;
                     } else {
-                        System.out.println("Cannot retrieve artist image url.");
+                        releaseInfo.getChildren().add(new Text("\n\t+ "
+                            + artist.tags.get(i).toString()));
                     }
-                } else {
-                    System.out.println("2. Cannot retrieve artist image.");
                 }
-            } catch (IOException | InterruptedException e) {
-                System.err.println("1. Cannot retrieve artist image.");
+            } else {
+                releaseInfo.getChildren().add(new Text(" N/A "));
             }
-        }).start();
+        } else {
+            nullArtistAlert();
+        }
+    }
+
+
+    public void loadImage() {
+        String term = URLEncoder.encode(artist.name, StandardCharsets.UTF_8);
+        String limit = URLEncoder.encode("200", StandardCharsets.UTF_8);
+        String query = String.format("?term=%s&limit=%s", term, limit);
+        String media = "music";
+        String createUrl = "https://itunes.apple.com/search" + query
+            + "&media=" + media;
+
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(createUrl))
+                .build();
+            HttpResponse<String> response = HTTP_CLIENT
+                .send(request, BodyHandlers.ofString());
+            Gson gson = new Gson();
+            int statusCode = response.statusCode();
+            if (statusCode == 200) {
+                String json = response.body();
+                ItunesResponse itunesResp = gson.fromJson(json, ItunesResponse.class);
+                if (itunesResp != null && itunesResp.results.get(0).artworkUrl100 != null) {
+                    artistImage.setImage(new Image(itunesResp.results
+                        .get(0).artworkUrl100));
+                }
+            } else {
+                System.out.println("Status Code error: " + statusCode);
+            }
+        } catch (IOException | InterruptedException e) {
+            System.out.println("Cannot retrieve album image");
+        }
     }
 
     public void setButtonImages(String imageUrl) {
@@ -304,25 +342,40 @@ public class ApiAppLoader extends VBox {
         Image image = new Image(imageUrl);
 
         artistImage1.setFitHeight(100);
-        artistImage1.setFitWidth(100);
+        artistImage1.setFitWidth(150);
         artistImage1.setImage(image);
         artist1.setGraphic(artistImage1);
+        artist1.setContentDisplay(ContentDisplay.TOP);
 
         artistImage2.setFitHeight(100);
-        artistImage2.setFitWidth(100);
+        artistImage2.setFitWidth(150);
         artistImage2.setImage(image);
         artist2.setGraphic(artistImage2);
+        artist2.setContentDisplay(ContentDisplay.TOP);
 
         artistImage3.setFitHeight(100);
-        artistImage3.setFitWidth(100);
+        artistImage3.setFitWidth(150);
         artistImage3.setImage(image);
         artist3.setGraphic(artistImage3);
+        artist3.setContentDisplay(ContentDisplay.TOP);
     }
 
-    public String parseJson(String toParse) {
-        int begin = 8 + toParse.indexOf("#text");
-        int end = 3 + toParse.indexOf("png");
-        System.out.println(toParse.substring(begin, end));
-        return toParse.substring(begin, end);
+    private void nullArtistAlert() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error");
+        alert.setContentText("URI: 0 distinct results found.");
+        alert.showAndWait();
+        searchButton.setDisable(false);
     }
+
+    private void emptySearchAlert() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error");
+        alert.setContentText("URI: Search bar is empty.");
+        alert.showAndWait();
+        searchButton.setDisable(false);
+    }
+
 }
