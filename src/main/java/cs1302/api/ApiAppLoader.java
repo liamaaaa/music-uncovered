@@ -351,9 +351,9 @@ public class ApiAppLoader extends VBox {
             if (statusCode == 200) {
                 String json = response.body();
                 ItunesResponse itunesResp = gson.fromJson(json, ItunesResponse.class);
-                if (itunesResp != null && itunesResp.results.get(0).artworkUrl100 != null) {
+                if (itunesResp != null && itunesResp.results.get(1).artworkUrl100 != null) {
                     artistImage.setImage(new Image(itunesResp.results
-                        .get(0).artworkUrl100));
+                        .get(1).artworkUrl100));
                 }
             } else {
                 System.out.println("Status Code error: " + statusCode);
@@ -361,10 +361,12 @@ public class ApiAppLoader extends VBox {
         } catch (IOException | InterruptedException e) {
             System.out.println("Cannot retrieve album image");
         }
-        }
+    }
 
     /**
      * Sets images for 3 bottom buttons.
+     * @param imageUrl Defines that url to set the graphics
+     *     of the buttons to.
      */
     public void setButtonImages(String imageUrl) {
         artist1.setPrefWidth(205);
